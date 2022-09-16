@@ -21,24 +21,25 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @Configuration
-@Slf4j
+
 public class CommandHandle {
 
     @Bean
     public RouterFunction<ServerResponse> createPost(CreatePostUseCase useCase) {
+
         return route(
                 POST("/create/post")
                         .and(accept(MediaType.APPLICATION_JSON)),
                 request -> useCase.apply(request.bodyToMono(CreatePostCommand.class))
                         .collectList()
                         .flatMap(domainEvents -> {{
-                            log.info(domainEvents.toString() + " " + "Create Post Done Succesfully");
+
                             return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(domainEvents);
                                 }}
 
                         )
                         .onErrorResume(error -> {
-                            log.error(error.getMessage());
+
                             return ServerResponse.badRequest().build();
                         })
 
@@ -56,14 +57,14 @@ public class CommandHandle {
                         .collectList()
                         .flatMap(domainEvents -> {
                                     {
-                                        log.info(domainEvents.toString() + " " + " AddComment Succesfully");
+
                                         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(domainEvents);
                                     }
                                 }
                         )
 
                         .onErrorResume(error -> {
-                            log.error(error.getMessage() + " soy un error en logger ");
+
                             return ServerResponse.badRequest().build();
                         })
         );
