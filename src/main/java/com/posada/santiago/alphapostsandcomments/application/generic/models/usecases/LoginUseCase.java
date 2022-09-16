@@ -23,6 +23,7 @@ public class LoginUseCase {
     private final ReactiveAuthenticationManager authenticationManager;
 
     public Mono<ServerResponse> logIn(Mono<AuthenticationRequest> authenticationRequest){
+
         return authenticationRequest
                 .flatMap(authRequest -> this.authenticationManager
                         .authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(),authRequest.getPassword()))

@@ -8,6 +8,7 @@ import com.posada.santiago.alphapostsandcomments.business.usecases.CreatePostUse
 import com.posada.santiago.alphapostsandcomments.domain.commands.AddCommentCommand;
 import com.posada.santiago.alphapostsandcomments.domain.commands.AddFavorites;
 import com.posada.santiago.alphapostsandcomments.domain.commands.CreatePostCommand;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,12 +21,13 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
+@Slf4j
 @Configuration
-
 public class CommandHandle {
 
     @Bean
     public RouterFunction<ServerResponse> createPost(CreatePostUseCase useCase) {
+        log.info(" ----- LOGGUER:...Action in CommandHanddle ADDCOMMENT .");
 
         return route(
                 POST("/create/post")
@@ -50,6 +52,7 @@ public class CommandHandle {
     @Bean
     public RouterFunction<ServerResponse> addComment(AddCommentUseCase useCase) {
 
+        log.info(" ----- LOGGUER:...Action in CommandHanddle ADDCOMMENT .");
         return route(
                 POST("/add/comment")
                         .and(accept(MediaType.APPLICATION_JSON)),

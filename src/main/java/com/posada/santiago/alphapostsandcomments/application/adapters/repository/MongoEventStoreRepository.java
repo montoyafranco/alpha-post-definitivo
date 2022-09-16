@@ -4,6 +4,7 @@ import co.com.sofka.domain.generic.DomainEvent;
 import com.google.gson.Gson;
 import com.posada.santiago.alphapostsandcomments.application.generic.models.StoredEvent;
 import com.posada.santiago.alphapostsandcomments.business.gateways.DomainEventRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -14,6 +15,7 @@ import reactor.core.publisher.Mono;
 import java.util.Comparator;
 import java.util.Date;
 
+@Slf4j
 @Repository
 public class MongoEventStoreRepository implements DomainEventRepository {
 
@@ -27,6 +29,7 @@ public class MongoEventStoreRepository implements DomainEventRepository {
 
     @Override
     public Flux<DomainEvent> findById(String aggregateId) {
+        log.info(" ----- LOGGUER:...Action in MongoEventStoreRepository FindbyIDs .");
         var query = new Query(Criteria.where("aggregateRootId").is(aggregateId));
         return template.find(query, DocumentEventStored.class)
                 .sort(Comparator.comparing(event -> event.getStoredEvent().getOccurredOn()))
@@ -42,6 +45,7 @@ public class MongoEventStoreRepository implements DomainEventRepository {
 
     @Override
     public Mono<DomainEvent> saveEvent(DomainEvent event) {
+        log.info(" ----- LOGGUER:...Action in MongoEventStoreRepository SaveEvent .");
         DocumentEventStored eventStored = new DocumentEventStored();
         eventStored.setAggregateRootId(event.aggregateRootId());
         eventStored.setStoredEvent(new StoredEvent(gson.toJson(event), new Date(), event.getClass().getCanonicalName()));

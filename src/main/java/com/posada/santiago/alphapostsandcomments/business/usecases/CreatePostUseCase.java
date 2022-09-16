@@ -9,11 +9,13 @@ import com.posada.santiago.alphapostsandcomments.domain.commands.CreatePostComma
 import com.posada.santiago.alphapostsandcomments.domain.values.Author;
 import com.posada.santiago.alphapostsandcomments.domain.values.PostId;
 import com.posada.santiago.alphapostsandcomments.domain.values.Title;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
+@Slf4j
 public class CreatePostUseCase extends UseCaseForCommand<CreatePostCommand> {
     private final DomainEventRepository repository;
     private final EventBus bus;
@@ -25,6 +27,7 @@ public class CreatePostUseCase extends UseCaseForCommand<CreatePostCommand> {
 
     @Override
     public Flux<DomainEvent> apply(Mono<CreatePostCommand> createPostCommandMono) {
+        log.info(" ----- LOGGUER:...Action in CreatePostUseCase createPost .");
         return createPostCommandMono
                 .flatMapIterable(command -> {
             Post post = new Post(PostId.of(command.getPostId()), new Title(command.getTitle()), new Author(command.getAuthor()));

@@ -4,10 +4,12 @@ import co.com.sofka.domain.generic.DomainEvent;
 import com.google.gson.Gson;
 import com.posada.santiago.alphapostsandcomments.application.config.RabbitConfig;
 import com.posada.santiago.alphapostsandcomments.business.gateways.EventBus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class RabbitMqEventBus implements EventBus {
     private final RabbitTemplate rabbitTemplate;
     private final Gson gson = new Gson();
@@ -18,6 +20,7 @@ public class RabbitMqEventBus implements EventBus {
 
     @Override
     public void publish(DomainEvent event) {
+        log.info(" ----- LOGGUER:...Action in RAbbitMQEventBus Publishing event to RabbitMQ.");
         var notification = new Notification(
                 event.getClass().getTypeName(),
                 gson.toJson(event)
