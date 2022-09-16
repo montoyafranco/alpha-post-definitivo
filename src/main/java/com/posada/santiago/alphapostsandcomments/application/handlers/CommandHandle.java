@@ -8,6 +8,7 @@ import com.posada.santiago.alphapostsandcomments.business.usecases.CreatePostUse
 import com.posada.santiago.alphapostsandcomments.domain.commands.AddCommentCommand;
 import com.posada.santiago.alphapostsandcomments.domain.commands.AddFavorites;
 import com.posada.santiago.alphapostsandcomments.domain.commands.CreatePostCommand;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -20,35 +21,60 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @Configuration
+@Slf4j
 public class CommandHandle {
 
     @Bean
-    public RouterFunction<ServerResponse> createPost(CreatePostUseCase useCase){
-
+    public RouterFunction<ServerResponse> createPost(CreatePostUseCase useCase) {
         return route(
-                POST("/create/post").and(accept(MediaType.APPLICATION_JSON)),
-                request -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromPublisher(useCase.apply(request.bodyToMono(CreatePostCommand.class)), DomainEvent.class))
+                POST("/create/post")
+                        .and(accept(MediaType.APPLICATION_JSON)),
+                request -> useCase.apply(request.bodyToMono(CreatePostCommand.class))
+                        .collectList()
+                        .flatMap(domainEvents -> {{
+                            log.info(domainEvents.toString() + " " + "Create Post Done Succesfully");
+                            return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(domainEvents);
+                                }}
+
+                        )
+                        .onErrorResume(error -> {
+                            log.error(error.getMessage());
+                            return ServerResponse.badRequest().build();
+                        })
+
         );
     }
+
 
     @Bean
-    public RouterFunction<ServerResponse> addComment(AddCommentUseCase useCase){
+    public RouterFunction<ServerResponse> addComment(AddCommentUseCase useCase) {
 
         return route(
-                POST("/add/comment").and(accept(MediaType.APPLICATION_JSON)),
-                request -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters
-                                .fromPublisher(useCase
-                                        .apply(request.bodyToMono(AddCommentCommand.class)), DomainEvent.class))
+                POST("/add/comment")
+                        .and(accept(MediaType.APPLICATION_JSON)),
+                request -> useCase.apply(request.bodyToMono(AddCommentCommand.class))
+                        .collectList()
+                        .flatMap(domainEvents -> {
+                                    {
+                                        log.info(domainEvents.toString() + " " + " AddComment Succesfully");
+                                        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(domainEvents);
+                                    }
+                                }
+                        )
+
+                        .onErrorResume(error -> {
+                            log.error(error.getMessage() + " soy un error en logger ");
+                            return ServerResponse.badRequest().build();
+                        })
         );
     }
+
     @Bean
     public RouterFunction<ServerResponse> addFavorites(AddFavoritesUseCase useCase) {
         return route(
                 POST("/add/favorites").and(accept(MediaType.APPLICATION_JSON)),
                 request -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromPublisher(useCase.apply(request.bodyToMono(AddFavorites.class)), DomainEvent.class ))
+                        .body(BodyInserters.fromPublisher(useCase.apply(request.bodyToMono(AddFavorites.class)), DomainEvent.class))
         );
     }
 }

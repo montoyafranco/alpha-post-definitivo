@@ -6,7 +6,9 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 public class JwtProvider {
-    private String secret = "god-saved-the-queen";
-    private long validTime = 3600000;//1h//ms
 
+    private String secretKey="god-saved-the-queen-of-uk";
+
+    //In milliseconds
+    private long validTime= 3600000; //1h*
 }
